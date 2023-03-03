@@ -1,0 +1,279 @@
+{
+  "type": "flex",
+  "altText": "預約通知",
+  "contents": {
+    "type": "carousel",
+    "contents": [
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "5.4E+7可預約時段",
+              "size": "25px",
+              "weight": "bold"
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "4/10",
+                  "margin": "8px",
+                  "weight": "regular",
+                  "style": "normal",
+                  "size": "19px"
+                }
+              ]
+            }
+          ],
+          "margin": "5px"
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "5.4E+7可預約時段",
+              "size": "25px",
+              "weight": "bold"
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "4/11",
+                  "margin": "8px",
+                  "weight": "regular",
+                  "style": "normal",
+                  "size": "19px"
+                }
+              ]
+            }
+          ],
+          "margin": "5px"
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "5.4E+7可預約時段",
+              "size": "25px",
+              "weight": "bold"
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "4/12",
+                  "margin": "8px",
+                  "weight": "regular",
+                  "style": "normal",
+                  "size": "19px"
+                }
+              ]
+            }
+          ],
+          "margin": "5px"
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "5.4E+7可預約時段",
+              "size": "25px",
+              "weight": "bold"
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "4/13",
+                  "margin": "8px",
+                  "weight": "regular",
+                  "style": "normal",
+                  "size": "19px"
+                }
+              ]
+            }
+          ],
+          "margin": "5px"
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "5.4E+7可預約時段",
+              "size": "25px",
+              "weight": "bold"
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "4/14",
+                  "margin": "8px",
+                  "weight": "regular",
+                  "style": "normal",
+                  "size": "19px"
+                }
+              ]
+            }
+          ],
+          "margin": "5px"
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "5.4E+7可預約時段",
+              "size": "25px",
+              "weight": "bold"
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "5/12",
+                  "margin": "8px",
+                  "weight": "regular",
+                  "style": "normal",
+                  "size": "19px"
+                }
+              ]
+            }
+          ],
+          "margin": "5px"
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "5.4E+7可預約時段",
+              "size": "25px",
+              "weight": "bold"
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "5/13",
+                  "margin": "8px",
+                  "weight": "regular",
+                  "style": "normal",
+                  "size": "19px"
+                }
+              ]
+            }
+          ],
+          "margin": "5px"
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "5.4E+7可預約時段",
+              "size": "25px",
+              "weight": "bold"
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "5/14",
+                  "margin": "8px",
+                  "weight": "regular",
+                  "style": "normal",
+                  "size": "19px"
+                }
+              ]
+            }
+          ],
+          "margin": "5px"
+        }
+      },
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "5.4E+7可預約時段",
+              "size": "25px",
+              "weight": "bold"
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "5/15",
+                  "margin": "8px",
+                  "weight": "regular",
+                  "style": "normal",
+                  "size": "19px"
+                }
+              ]
+            }
+          ],
+          "margin": "5px"
+        }
+      }
+    ]
+  }
+}
