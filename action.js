@@ -25,52 +25,53 @@ const db = admin.firestore();
 //concurrent problem
 let dateOrder = 0;
 module.exports.reserve = async (flexMessageTemplate) => {
-  // console.log(dataIndex);
-  for (let month = 4; month <= 5; month++) {
-    const beginDate = month === 4 ? 10 : 12;
-    const endDate = month === 4 ? 14 : 15;
+  const month = 4;
+  const beginDate = month === 4 ? 10 : 12;
+  const endDate = month === 4 ? 14 : 15;
 
-    for (let date = beginDate; date <= endDate; date++) {
-      await db
-        .collection("Booking-Time")
-        .doc(month.toString())
-        .collection(date.toString())
-        .get()
-        .then((querySnapshot) => {
-          console.log(`${month}/${date}`);
+  for (let date = beginDate; date <= endDate; date++) {
+    await db
+      .collection("Booking-Time")
+      .doc(month.toString())
+      .collection(date.toString())
+      .get()
+      .then((querySnapshot) => {
+        console.log(`${month}/${date}`);
 
-          let alphabeticalOrder = 0;
-          querySnapshot.forEach((doc) => {
-            const periodArr = doc.data().period;
-            for (let i = 0; i < periodArr.length; i++) {
-              let isReserved = periodArr[i];
-              flexMessageTemplate = buildJson.insertTimeJson(
-                flexMessageTemplate,
-                doc.id,
-                dateOrder,
-                alphabeticalOrder,
-                i,
-                isReserved
-              );
-              alphabeticalOrder++;
-            }
-          });
-          flexMessageTemplate.contents.contents[dateOrder].header.contents.push(
-            {
-              type: "text",
-              text: `如需預約請輸入以下格式\n月/日/時段\n舉例：4/10/A`,
-              margin: "8px",
-              weight: "regular",
-              style: "normal",
-              size: "19px",
-              wrap: true,
-            }
-          );
-          console.log("------------------");
+        let alphabeticalOrder = 0;
+        querySnapshot.forEach((doc) => {
+          const periodArr = doc.data().period;
+          for (let i = 0; i < periodArr.length; i++) {
+            let isReserved = periodArr[i];
+
+            //塞入時段
+            flexMessageTemplate = buildJson.insertTimeJson(
+              flexMessageTemplate,
+              doc.id,
+              dateOrder,
+              alphabeticalOrder,
+              i,
+              isReserved
+            );
+            alphabeticalOrder++;
+          }
         });
-      dateOrder++;
-    }
+
+        //塞入格式訊息
+        flexMessageTemplate.contents.contents[dateOrder].header.contents.push({
+          type: "text",
+          text: `如需預約請輸入以下格式\n月/日/時段\n舉例：4/10/A`,
+          margin: "8px",
+          weight: "regular",
+          style: "normal",
+          size: "19px",
+          wrap: true,
+        });
+        console.log("------------------");
+      });
+    dateOrder++;
   }
+
   dateOrder = 0;
   return flexMessageTemplate;
 };
@@ -95,14 +96,14 @@ module.exports.isReserved = async (request, userID) => {
     .collection(date)
     .doc(hour)
     .get()
-    .then((doc) => {
+    .then(async (doc) => {
       const timeIsReserved = doc.data().period[time];
       if (timeIsReserved) {
         reply.text = "該時間已被預約";
       } else {
-        const userIsReserved = false;
+        const userIsReserved = await checkIsReserved(userID);
         if (userIsReserved) {
-          reply.text = "每個帳號只能預約一次";
+          reply.text = "抱歉因多方考量，每個帳號只能預約一次";
         } else {
           reply.text = "請輸入email";
           db.collection("userInfo")
@@ -117,3 +118,33 @@ module.exports.isReserved = async (request, userID) => {
 
   return reply;
 };
+
+module.exports.writeEmail = async (request, userID) => {
+  const userIsReserved = await checkIsReserved(userID);
+  if (userIsReserved) {
+    await db.collection("userInfo").doc(userID).update({
+      email: request,
+    });
+    return {
+      type: "text",
+      text: "完成預約，請提前十分鐘抵達現場。",
+    };
+  } else {
+    return {
+      type: "text",
+      text: "尚未選擇時間",
+    };
+  }
+};
+
+async function checkIsReserved(userID) {
+  let userIsReserved = await db
+    .collection("userInfo")
+    .doc(userID)
+    .get()
+    .then((doc) => {
+      return doc.exists ? true : false;
+    });
+
+  return userIsReserved;
+}
