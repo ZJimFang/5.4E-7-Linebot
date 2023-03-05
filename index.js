@@ -1,5 +1,6 @@
+//bug：單一用戶發出太多請求會造成congestion
+
 require("dotenv").config();
-// index.js
 const line = require("@line/bot-sdk");
 const express = require("express");
 const action = require("./action");
@@ -11,6 +12,12 @@ const config = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
   channelSecret: process.env.CHANNEL_SECRET,
 };
+
+const admin = require("firebase-admin");
+admin.initializeApp({
+  credential: admin.credential.cert(require("./admin.json")),
+});
+const db = admin.firestore();
 
 const client = new line.Client(config);
 
@@ -45,7 +52,6 @@ async function handleEvent(event, flexMessageTemplate) {
 
   if (event.type !== "message" || event.message.type !== "text") return;
 
-  let reply;
   let request = event.message.text;
 
   const dateRegex = /^[45]\/1[0-5]\/[A-N]$/;
@@ -61,7 +67,7 @@ async function handleEvent(event, flexMessageTemplate) {
         text: "請稍候",
       });
       //to db query data to build json file
-      let reply = await action.reserve(flexMessageTemplate);
+      const reply = await action.reserve(db, flexMessageTemplate);
       await client.replyMessage(event.replyToken, reply);
     }
     //
@@ -73,7 +79,7 @@ async function handleEvent(event, flexMessageTemplate) {
     }
     //query
     else if (request === "查詢") {
-      let reply = await action.query(userID);
+      const reply = await action.query(db, userID);
       await client.replyMessage(event.replyToken, reply);
     }
     //delete
@@ -82,15 +88,24 @@ async function handleEvent(event, flexMessageTemplate) {
         type: "text",
         text: "正在刪除您的時段，請稍候",
       });
-      let reply = await action.delete(userID);
+      const reply = await action.delete(db, userID);
       await client.replyMessage(event.replyToken, {
         type: "text",
         text: "您的預約已刪除",
       });
+    } else if (request === "文字雲") {
+      const profile = await client.getProfile(userID);
+      console.log(profile);
+      const reply = await action.changeToWordCloudStatus(
+        db,
+        userID,
+        profile.displayName
+      );
+      await client.replyMessage(event.replyToken, reply);
     }
     //check is reserved and write in database
     else if (dateRegex.test(request)) {
-      reply = await action.isReserved(request, userID);
+      const reply = await action.isReserved(db, request, userID);
       await client.replyMessage(event.replyToken, reply);
     }
     //write email in database
@@ -99,16 +114,26 @@ async function handleEvent(event, flexMessageTemplate) {
         type: "text",
         text: "正在預約您的時段，請稍候",
       });
-      reply = await action.writeEmail(request, userID);
+      const reply = await action.writeEmail(db, request, userID);
       await client.replyMessage(event.replyToken, reply);
     }
     //default
     else {
-      await client.replyMessage(event.replyToken, {
-        type: "text",
-        text: "很抱歉！\n本帳號無法個別回覆用戶的訊息，或是確認您的訊息格式是否正確",
-        wrap: true,
-      });
+      const status = await checkIsInWordCloud(userID);
+      if (status) {
+        await client.pushMessage(event.source.userId, {
+          type: "text",
+          text: "正在傳送至文字雲，請稍候",
+        });
+        const reply = await action.writeInWordCloud(db, request, userID);
+        await client.replyMessage(event.replyToken, reply);
+      } else {
+        await client.replyMessage(event.replyToken, {
+          type: "text",
+          text: "很抱歉！\n本帳號無法個別回覆用戶的訊息，或是確認您的訊息格式是否正確",
+          wrap: true,
+        });
+      }
     }
   } catch (error) {
     console.log(error);
@@ -125,3 +150,15 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`listening on ${port}`);
 });
+
+async function checkIsInWordCloud(userID) {
+  const status = await db
+    .collection("WordCloud")
+    .doc(userID)
+    .get()
+    .then((doc) => {
+      return doc.data().status;
+    });
+
+  return status;
+}

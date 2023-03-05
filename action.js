@@ -16,15 +16,11 @@ const stringToDetail = {
 };
 
 const buildJson = require("./functions/buildJson");
-const admin = require("firebase-admin");
-admin.initializeApp({
-  credential: admin.credential.cert(require("./admin.json")),
-});
-const db = admin.firestore();
 
 //concurrent problem
 let dateOrder = 0;
-module.exports.reserve = async (flexMessageTemplate) => {
+
+module.exports.reserve = async (db, flexMessageTemplate) => {
   const month = 4;
   const beginDate = month === 4 ? 10 : 12;
   const endDate = month === 4 ? 14 : 15;
@@ -76,7 +72,7 @@ module.exports.reserve = async (flexMessageTemplate) => {
   return flexMessageTemplate;
 };
 
-module.exports.isReserved = async (request, userID) => {
+module.exports.isReserved = async (db, request, userID) => {
   const schedule = request.split("/");
   let reply = {
     type: "text",
@@ -117,7 +113,7 @@ module.exports.isReserved = async (request, userID) => {
   return reply;
 };
 
-module.exports.writeEmail = async (request, userID) => {
+module.exports.writeEmail = async (db, request, userID) => {
   //user是否已選擇時間
   const userIsReserved = await checkIsReserved(userID);
 
@@ -183,7 +179,7 @@ module.exports.writeEmail = async (request, userID) => {
   }
 };
 
-module.exports.query = async (userID) => {
+module.exports.query = async (db, userID) => {
   let month, date, hour, minute;
   let reply = {
     type: "text",
@@ -209,7 +205,7 @@ module.exports.query = async (userID) => {
   return reply;
 };
 
-module.exports.delete = async (userID) => {
+module.exports.delete = async (db, userID) => {
   let month, date, hour, time;
   const userInfoRef = db.collection("userInfo").doc(userID);
 
@@ -240,7 +236,33 @@ module.exports.delete = async (userID) => {
   await userInfoRef.delete();
 };
 
-async function checkIsReserved(userID) {
+module.exports.changeToWordCloudStatus = async (db, userID, name) => {
+  await db.collection("WordCloud").doc(userID).set({
+    status: true,
+    name: name,
+    text: "",
+  });
+
+  return {
+    type: "text",
+    text: "有什麼想對5.4E+7說的話嗎？\n請輸入想說的話！並到我們的文字雲專區觀看吧",
+    wrap: true,
+  };
+};
+
+module.exports.writeInWordCloud = async (db, request, userID) => {
+  await db.collection("WordCloud").doc(userID).update({
+    status: false,
+    text: request,
+  });
+  return {
+    type: "text",
+    text: "已收到您的回覆，請至文字雲專區查看\n文字雲專區：------",
+    wrap: true,
+  };
+};
+
+async function checkIsReserved(db, userID) {
   let userIsReserved = await db
     .collection("userInfo")
     .doc(userID)
