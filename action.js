@@ -88,8 +88,6 @@ module.exports.isReserved = async (request, userID) => {
   const hour = schedule[2][0];
   const time = schedule[2][1];
 
-  console.log(month, date, hour, time);
-
   await db
     .collection("Booking-Time")
     .doc(month)
@@ -120,21 +118,126 @@ module.exports.isReserved = async (request, userID) => {
 };
 
 module.exports.writeEmail = async (request, userID) => {
+  //user是否已選擇時間
   const userIsReserved = await checkIsReserved(userID);
-  if (userIsReserved) {
-    await db.collection("userInfo").doc(userID).update({
-      email: request,
+
+  //user是否已填寫過email
+  const hasEmail = await db
+    .collection("userInfo")
+    .doc(userID)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        return doc.data().email === "" ? false : true;
+      }
     });
-    return {
-      type: "text",
-      text: "完成預約，請提前十分鐘抵達現場。",
-    };
+
+  if (userIsReserved) {
+    if (hasEmail) {
+      return {
+        type: "text",
+        text: "您已預約，如需更改資訊請私訊粉絲專頁。",
+      };
+    } else {
+      let month, date, hour, time;
+
+      //update email
+      const userInfoRef = db.collection("userInfo").doc(userID);
+      await userInfoRef.update({
+        email: request,
+      });
+
+      //get user reserved time
+      await userInfoRef.get().then((doc) => {
+        reservedTime = doc.data().reservedTime;
+        month = reservedTime[0];
+        date = reservedTime[1];
+        hour = reservedTime[2];
+        time = reservedTime[3];
+      });
+
+      //update booking table
+      const bookingRef = db
+        .collection("Booking-Time")
+        .doc(month)
+        .collection(date)
+        .doc(hour);
+
+      const periodArr = await bookingRef.get().then((doc) => {
+        return doc.data().period;
+      });
+      periodArr[time] = true;
+
+      await bookingRef.update({ period: periodArr });
+
+      return {
+        type: "text",
+        text: "完成預約，請提前十分鐘抵達現場。",
+      };
+    }
   } else {
     return {
       type: "text",
-      text: "尚未選擇時間",
+      text: "尚未選擇時間。",
     };
   }
+};
+
+module.exports.query = async (userID) => {
+  let month, date, hour, minute;
+  let reply = {
+    type: "text",
+    text: "",
+    wrap: true,
+  };
+  await db
+    .collection("userInfo")
+    .doc(userID)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        const reservedTime = doc.data().reservedTime;
+        month = reservedTime[0];
+        date = reservedTime[1];
+        hour = reservedTime[2];
+        minute = reservedTime[3] === 0 ? "00" : "30";
+        reply.text = `您預約的時間是${month}/${date} ${hour}:${minute}\n請於十分鐘前抵達現場，謝謝！`;
+      } else {
+        reply.text = "您尚未預約時段";
+      }
+    });
+  return reply;
+};
+
+module.exports.delete = async (userID) => {
+  let month, date, hour, time;
+  const userInfoRef = db.collection("userInfo").doc(userID);
+
+  //update bookingTime
+  await userInfoRef.get().then((doc) => {
+    reservedTime = doc.data().reservedTime;
+    month = reservedTime[0];
+    date = reservedTime[1];
+    hour = reservedTime[2];
+    time = reservedTime[3];
+  });
+
+  const bookingRef = db
+    .collection("Booking-Time")
+    .doc(month)
+    .collection(date)
+    .doc(hour);
+
+  const periodArr = await bookingRef.get().then((doc) => {
+    const arr = doc.data().period;
+    arr[time] = false;
+    return arr;
+  });
+
+  await bookingRef.update({ period: periodArr });
+
+  //delete userInfo
+  await userInfoRef.delete();
 };
 
 async function checkIsReserved(userID) {

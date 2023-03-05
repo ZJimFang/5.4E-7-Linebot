@@ -1,0 +1,40 @@
+{
+  "type": "flex",
+  "altText": "查詢/刪除",
+  "contents": {
+    "type": "carousel",
+    "contents": [
+      {
+        "type": "bubble",
+        "header": {
+          "type": "box",
+          "layout": "vertical",
+          "spacing": "sm",
+          "contents": [
+            {
+              "type": "button",
+              "style": "link",
+              "height": "sm",
+              "action": {
+                "type": "message",
+                "label": "查詢",
+                "text": "查詢"
+              }
+            },
+            {
+              "type": "button",
+              "style": "link",
+              "height": "sm",
+              "action": {
+                "type": "message",
+                "label": "刪除",
+                "text": "刪除"
+              }
+            }
+          ],
+          "flex": 0
+        }
+      }
+    ]
+  }
+}
