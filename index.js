@@ -1,10 +1,13 @@
-//bug：單一用戶發出太多請求會造成congestion
-
 require("dotenv").config();
 const line = require("@line/bot-sdk");
 const express = require("express");
 const action = require("./action");
 const schedule = require("node-schedule");
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const nodemailer = require("nodemailer");
+const cors = require("cors")({ origin: true });
+
 const initialFlexMessageTemplate = require("./template/flexMsgTemplate.json");
 const queryDeleteFlexMessageTemplate = require("./template/queryDelete.json");
 
@@ -13,7 +16,6 @@ const config = {
   channelSecret: process.env.CHANNEL_SECRET,
 };
 
-const admin = require("firebase-admin");
 admin.initializeApp({
   credential: admin.credential.cert(require("./admin.json")),
 });
@@ -26,6 +28,28 @@ const app = express();
 let lock = false;
 
 const eventQueue = [];
+const requestTable = [];
+
+//webhook
+app.post("/webhook", line.middleware(config), (req, res) => {
+  let destination = req.body.destination;
+  if (
+    destination ===
+    requestTable.find((element) => element == req.body.destination)
+  ) {
+    client.pushMessage(req.body.events[0].source.userId, {
+      type: "text",
+      text: "請勿短時間內發出大量請求，否則將被禁止",
+    });
+    return;
+  }
+
+  requestTable.push(req.body.destination);
+  eventQueue.push(req.body.events[0]);
+  res.send(200);
+});
+
+//scheduler
 const job = schedule.scheduleJob("* * * * * *", async function () {
   if (eventQueue.length > 0 && !lock) {
     //init json
@@ -36,28 +60,21 @@ const job = schedule.scheduleJob("* * * * * *", async function () {
     lock = true;
     const event = eventQueue.shift();
     await handleEvent(event, flexMessageTemplate);
+    await requestTable.shift();
     lock = false;
   }
 });
 
-app.post("/webhook", line.middleware(config), (req, res) => {
-  eventQueue.push(req.body.events[0]);
-  res.send(200);
-});
-
 // event handler
 async function handleEvent(event, flexMessageTemplate) {
-  // console.log(event.message.id);
   const userID = event.source.userId;
 
   if (event.type !== "message" || event.message.type !== "text") return;
 
   let request = event.message.text;
-
   const dateRegex = /^[45]\/1[0-5]\/[A-N]$/;
   const emailRegex =
     /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
-
   try {
     //output reserve schedule
     if (request === "預約時間") {
@@ -69,9 +86,7 @@ async function handleEvent(event, flexMessageTemplate) {
       //to db query data to build json file
       const reply = await action.reserve(db, flexMessageTemplate);
       await client.replyMessage(event.replyToken, reply);
-    }
-    //
-    else if (request === "查詢/刪除預約") {
+    } else if (request === "查詢/刪除預約") {
       await client.replyMessage(
         event.replyToken,
         queryDeleteFlexMessageTemplate
@@ -95,11 +110,11 @@ async function handleEvent(event, flexMessageTemplate) {
       });
     } else if (request === "文字雲") {
       const profile = await client.getProfile(userID);
-      console.log(profile);
       const reply = await action.changeToWordCloudStatus(
         db,
         userID,
-        profile.displayName
+        profile.displayName,
+        profile.pictureUrl
       );
       await client.replyMessage(event.replyToken, reply);
     }
@@ -145,12 +160,7 @@ async function handleEvent(event, flexMessageTemplate) {
   console.log("finish");
 }
 
-// listen on port
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`listening on ${port}`);
-});
-
+//check user status
 async function checkIsInWordCloud(userID) {
   const status = await db
     .collection("WordCloud")
@@ -162,3 +172,42 @@ async function checkIsInWordCloud(userID) {
 
   return status;
 }
+
+//cloud functions(mail)
+// let transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     user: "yourgmailaccount@gmail.com",
+//     pass: "yourgmailaccpassword",
+//   },
+// });
+// exports.sendMail = functions.https.onRequest((req, res) => {
+//   cors(req, res, () => {
+//     // getting dest email by query string
+//     const dest = req.query.dest;
+
+//     const mailOptions = {
+//       from: "Your Account Name <yourgmailaccount@gmail.com>", // Something like: Jane Doe <janedoe@gmail.com>
+//       to: dest,
+//       subject: "I'M A PICKLE!!!", // email subject
+//       html: `<p style="font-size: 16px;">Pickle Riiiiiiiiiiiiiiiick!!</p>
+//               <br />
+//               <img src="https://images.prod.meredith.com/product/fc8754735c8a9b4aebb786278e7265a5/1538025388228/l/rick-and-morty-pickle-rick-sticker" />
+//           `, // email content in HTML
+//     };
+
+//     // returning result
+//     return transporter.sendMail(mailOptions, (erro, info) => {
+//       if (erro) {
+//         return res.send(erro.toString());
+//       }
+//       return res.send("Sended");
+//     });
+//   });
+// });
+
+// listen on port
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`listening on ${port}`);
+});

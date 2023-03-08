@@ -95,7 +95,7 @@ module.exports.isReserved = async (db, request, userID) => {
       if (timeIsReserved) {
         reply.text = "該時間已被預約";
       } else {
-        const userIsReserved = await checkIsReserved(userID);
+        const userIsReserved = await checkIsReserved(db, userID);
         if (userIsReserved) {
           reply.text = "抱歉因多方考量，每個帳號只能預約一次";
         } else {
@@ -115,7 +115,7 @@ module.exports.isReserved = async (db, request, userID) => {
 
 module.exports.writeEmail = async (db, request, userID) => {
   //user是否已選擇時間
-  const userIsReserved = await checkIsReserved(userID);
+  const userIsReserved = await checkIsReserved(db, userID);
 
   //user是否已填寫過email
   const hasEmail = await db
@@ -149,7 +149,7 @@ module.exports.writeEmail = async (db, request, userID) => {
         month = reservedTime[0];
         date = reservedTime[1];
         hour = reservedTime[2];
-        time = reservedTime[3];
+        block = reservedTime[3];
       });
 
       //update booking table
@@ -162,9 +162,15 @@ module.exports.writeEmail = async (db, request, userID) => {
       const periodArr = await bookingRef.get().then((doc) => {
         return doc.data().period;
       });
-      periodArr[time] = true;
 
-      await bookingRef.update({ period: periodArr });
+      const userArr = await bookingRef.get().then((doc) => {
+        return doc.data().user;
+      });
+
+      periodArr[block] = true;
+      userArr[block] = userID;
+
+      await bookingRef.update({ period: periodArr, user: userArr });
 
       return {
         type: "text",
@@ -236,11 +242,12 @@ module.exports.delete = async (db, userID) => {
   await userInfoRef.delete();
 };
 
-module.exports.changeToWordCloudStatus = async (db, userID, name) => {
+module.exports.changeToWordCloudStatus = async (db, userID, name, avatar) => {
   await db.collection("WordCloud").doc(userID).set({
     status: true,
     name: name,
     text: "",
+    avatar: avatar,
   });
 
   return {
@@ -257,7 +264,7 @@ module.exports.writeInWordCloud = async (db, request, userID) => {
   });
   return {
     type: "text",
-    text: "已收到您的回覆，請至文字雲專區查看\n文字雲專區：------",
+    text: "已收到您的回覆，請至文字雲專區查看\n文字雲專區：https://dot4eplus7.web.app/",
     wrap: true,
   };
 };
