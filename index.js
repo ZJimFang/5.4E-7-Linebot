@@ -32,10 +32,11 @@ const requestTable = [];
 
 //webhook
 app.post("/webhook", line.middleware(config), (req, res) => {
-  let destination = req.body.destination;
+  console.log(req.body.events[0].source.userId);
+  let userId = req.body.events[0].source.userId;
   if (
-    destination ===
-    requestTable.find((element) => element == req.body.destination)
+    userId ===
+    requestTable.find((element) => element == req.body.events[0].source.userId)
   ) {
     client.pushMessage(req.body.events[0].source.userId, {
       type: "text",
@@ -44,13 +45,13 @@ app.post("/webhook", line.middleware(config), (req, res) => {
     return;
   }
 
-  requestTable.push(req.body.destination);
+  requestTable.push(userId);
   eventQueue.push(req.body.events[0]);
   res.send(200);
 });
 
 //scheduler
-const job = schedule.scheduleJob("* * * * * *", async function () {
+const eventJob = schedule.scheduleJob("* * * * * *", async function () {
   if (eventQueue.length > 0 && !lock) {
     //init json
     let flexMessageTemplate = JSON.parse(
@@ -63,6 +64,35 @@ const job = schedule.scheduleJob("* * * * * *", async function () {
     await requestTable.shift();
     lock = false;
   }
+});
+
+//scheduler setting
+const rule = new schedule.RecurrenceRule();
+rule.minute = [0, 30];
+
+const remindJob = schedule.scheduleJob(rule, async function () {
+  const date = new Date();
+  const month = (date.getMonth() + 1).toString();
+  const day = date.getDate().toString();
+  const hour = date.getHours().toString();
+  const period = date.getMinutes() <= 30 ? 0 : 1;
+
+  await db
+    .collection("Booking-Time")
+    .doc(month)
+    .collection(day)
+    .doc(hour)
+    .get()
+    .then(async (doc) => {
+      const hasReserved = doc.data().period[period];
+      if (hasReserved) {
+        const userID = doc.data().user[period];
+        await client.pushMessage(userID, {
+          type: "text",
+          text: "您的預約即將開始，請提前至5.4E+7展場報到！",
+        });
+      }
+    });
 });
 
 // event handler
@@ -172,39 +202,6 @@ async function checkIsInWordCloud(userID) {
 
   return status;
 }
-
-//cloud functions(mail)
-// let transporter = nodemailer.createTransport({
-//   service: "gmail",
-//   auth: {
-//     user: "yourgmailaccount@gmail.com",
-//     pass: "yourgmailaccpassword",
-//   },
-// });
-// exports.sendMail = functions.https.onRequest((req, res) => {
-//   cors(req, res, () => {
-//     // getting dest email by query string
-//     const dest = req.query.dest;
-
-//     const mailOptions = {
-//       from: "Your Account Name <yourgmailaccount@gmail.com>", // Something like: Jane Doe <janedoe@gmail.com>
-//       to: dest,
-//       subject: "I'M A PICKLE!!!", // email subject
-//       html: `<p style="font-size: 16px;">Pickle Riiiiiiiiiiiiiiiick!!</p>
-//               <br />
-//               <img src="https://images.prod.meredith.com/product/fc8754735c8a9b4aebb786278e7265a5/1538025388228/l/rick-and-morty-pickle-rick-sticker" />
-//           `, // email content in HTML
-//     };
-
-//     // returning result
-//     return transporter.sendMail(mailOptions, (erro, info) => {
-//       if (erro) {
-//         return res.send(erro.toString());
-//       }
-//       return res.send("Sended");
-//     });
-//   });
-// });
 
 // listen on port
 const port = process.env.PORT || 3000;

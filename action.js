@@ -235,8 +235,13 @@ module.exports.delete = async (db, userID) => {
     arr[time] = false;
     return arr;
   });
+  const userArr = await bookingRef.get().then((doc) => {
+    const arr = doc.data().user;
+    arr[time] = "";
+    return arr;
+  });
 
-  await bookingRef.update({ period: periodArr });
+  await bookingRef.update({ period: periodArr, user: userArr });
 
   //delete userInfo
   await userInfoRef.delete();
