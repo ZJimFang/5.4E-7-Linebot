@@ -7,7 +7,6 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
 const cors = require("cors")({ origin: true });
-const home = require("./home");
 
 const initialFlexMessageTemplate = require("./template/flexMsgTemplate.json");
 const queryDeleteFlexMessageTemplate = require("./template/queryDelete.json");
@@ -31,7 +30,12 @@ let lock = false;
 const eventQueue = [];
 const requestTable = [];
 
-app.get("/home", home);
+app.get("/home", (req, res) => {
+  return res.status(200).json({
+    title: "Express Testing",
+    message: "The app is working properly!",
+  });
+});
 //webhook
 app.post("/webhook", line.middleware(config), (req, res) => {
   console.log(req.body.events[0].source.userId);
