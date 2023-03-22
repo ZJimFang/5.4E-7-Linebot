@@ -38,8 +38,7 @@ app.get("/home", (req, res) => {
 });
 //webhook
 app.post("/webhook", line.middleware(config), (req, res) => {
-  console.log(req.body.events[0].source.userId);
-  let userId = req.body.events[0].source.userId;
+  let userId = req.body.events[0].source.userId || "";
   if (
     userId ===
     requestTable.find((element) => element == req.body.events[0].source.userId)
