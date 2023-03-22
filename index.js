@@ -38,20 +38,24 @@ app.get("/home", (req, res) => {
 });
 //webhook
 app.post("/webhook", line.middleware(config), (req, res) => {
-  let userId = req.body.events[0].source.userId || "";
-  if (
-    userId ===
-    requestTable.find((element) => element == req.body.events[0].source.userId)
-  ) {
-    client.pushMessage(req.body.events[0].source.userId, {
-      type: "text",
-      text: "請勿短時間內發出大量請求，否則將被禁止",
-    });
-    return;
-  }
+  if (req.body.events[0].source.userId !== undefined) {
+    let userId = req.body.events[0].source.userId;
+    if (
+      userId ===
+      requestTable.find(
+        (element) => element == req.body.events[0].source.userId
+      )
+    ) {
+      client.pushMessage(req.body.events[0].source.userId, {
+        type: "text",
+        text: "請勿短時間內發出大量請求，否則將被禁止",
+      });
+      return;
+    }
 
-  requestTable.push(userId);
-  eventQueue.push(req.body.events[0]);
+    requestTable.push(userId);
+    eventQueue.push(req.body.events[0]);
+  }
   res.send(200);
 });
 
