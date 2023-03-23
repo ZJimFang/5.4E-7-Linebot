@@ -37,7 +37,7 @@ app.get("/home", (req, res) => {
   });
 });
 //webhook
-app.post("/webhook", line.middleware(config), (req, res) => {
+app.post("/webhook", line.middleware(config), async (req, res) => {
   if (req.body.events[0].source === undefined) {
     res.send(200);
     return;
@@ -54,27 +54,29 @@ app.post("/webhook", line.middleware(config), (req, res) => {
     return;
   }
 
-  requestTable.push(userId);
-  eventQueue.push(req.body.events[0]);
+  const event = req.body.events[0];
 
+  requestTable.push(userId);
+  await handleEvent(event, flexMessageTemplate);
+  await requestTable.shift();
   res.send(200);
 });
 
 //scheduler
-const eventJob = schedule.scheduleJob("* * * * * *", async function () {
-  if (eventQueue.length > 0 && !lock) {
-    //init json
-    let flexMessageTemplate = JSON.parse(
-      JSON.stringify(initialFlexMessageTemplate)
-    );
+// const eventJob = schedule.scheduleJob("* * * * * *", async function () {
+//   if (eventQueue.length > 0 && !lock) {
+//     //init json
+//     let flexMessageTemplate = JSON.parse(
+//       JSON.stringify(initialFlexMessageTemplate)
+//     );
 
-    lock = true;
-    const event = eventQueue.shift();
-    await handleEvent(event, flexMessageTemplate);
-    await requestTable.shift();
-    lock = false;
-  }
-});
+//     lock = true;
+//     const event = eventQueue.shift();
+//     await handleEvent(event, flexMessageTemplate);
+//     await requestTable.shift();
+//     lock = false;
+//   }
+// });
 
 //scheduler setting
 const rule = new schedule.RecurrenceRule();
