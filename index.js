@@ -38,48 +38,43 @@ app.get("/home", (req, res) => {
 });
 //webhook
 app.post("/webhook", line.middleware(config), (req, res) => {
-  if (req.body.events[0].source === undefined) {
-    res.send(200);
-    return;
-  }
-  let userId = req.body.events[0].source.userId;
-  if (
-    userId ===
-    requestTable.find((element) => element == req.body.events[0].source.userId)
-  ) {
-    client.pushMessage(req.body.events[0].source.userId, {
-      type: "text",
-      text: "請勿短時間內發出大量請求，否則將被禁止",
-    });
-    return;
+  if (req.body.events[0] !== undefined) {
+    let userId = req.body.events[0].source.userId;
+    if (
+      userId ===
+      requestTable.find(
+        (element) => element == req.body.events[0].source.userId
+      )
+    ) {
+      client.pushMessage(req.body.events[0].source.userId, {
+        type: "text",
+        text: "請勿短時間內發出大量請求，否則將被禁止",
+      });
+      return;
+    }
+
+    requestTable.push(userId);
+    eventQueue.push(req.body.events[0]);
   }
 
-  const event = req.body.events[0];
-  let flexMessageTemplate = JSON.parse(
-    JSON.stringify(initialFlexMessageTemplate)
-  );
-
-  requestTable.push(userId);
-  handleEvent(event, flexMessageTemplate);
-  requestTable.shift();
   res.send(200);
 });
 
 //scheduler
-// const eventJob = schedule.scheduleJob("* * * * * *", async function () {
-//   if (eventQueue.length > 0 && !lock) {
-//     //init json
-//     let flexMessageTemplate = JSON.parse(
-//       JSON.stringify(initialFlexMessageTemplate)
-//     );
+const eventJob = schedule.scheduleJob("* * * * * *", async function () {
+  if (eventQueue.length > 0 && !lock) {
+    //init json
+    let flexMessageTemplate = JSON.parse(
+      JSON.stringify(initialFlexMessageTemplate)
+    );
 
-//     lock = true;
-//     const event = eventQueue.shift();
-//     await handleEvent(event, flexMessageTemplate);
-//     await requestTable.shift();
-//     lock = false;
-//   }
-// });
+    lock = true;
+    const event = eventQueue.shift();
+    await handleEvent(event, flexMessageTemplate);
+    await requestTable.shift();
+    lock = false;
+  }
+});
 
 //scheduler setting
 const rule = new schedule.RecurrenceRule();
@@ -99,13 +94,15 @@ const remindJob = schedule.scheduleJob(rule, async function () {
     .doc(hour)
     .get()
     .then(async (doc) => {
-      const hasReserved = doc.data().period[period];
-      if (hasReserved) {
-        const userID = doc.data().user[period];
-        await client.pushMessage(userID, {
-          type: "text",
-          text: "您的預約即將開始，請提前至5.4E+7展場報到！",
-        });
+      if (doc.exists) {
+        const hasReserved = doc.data().period[period];
+        if (hasReserved) {
+          const userID = doc.data().user[period];
+          await client.pushMessage(userID, {
+            type: "text",
+            text: "您的預約即將開始，請提前至5.4E+7展場報到！",
+          });
+        }
       }
     });
 });
