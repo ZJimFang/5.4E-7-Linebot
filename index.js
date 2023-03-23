@@ -61,11 +61,14 @@ app.post("/webhook", line.middleware(config), (req, res) => {
     // );
 
     // handleEvent(req.body.events[0], flexMessageTemplate);
-
-    client.replyMessage(req.body.events[0].replyToken, {
-      type: "text",
-      text: "hello",
-    });
+    try {
+      client.replyMessage(req.body.events[0].replyToken, {
+        type: "text",
+        text: "hello",
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   res.send(200);
