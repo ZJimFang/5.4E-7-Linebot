@@ -37,7 +37,7 @@ app.get("/home", (req, res) => {
   });
 });
 //webhook
-app.post("/webhook", line.middleware(config), async (req, res) => {
+app.post("/webhook", line.middleware(config), (req, res) => {
   if (req.body.events[0].source === undefined) {
     res.send(200);
     return;
@@ -57,8 +57,8 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
   const event = req.body.events[0];
 
   requestTable.push(userId);
-  await handleEvent(event, flexMessageTemplate);
-  await requestTable.shift();
+  handleEvent(event, flexMessageTemplate);
+  requestTable.shift();
   res.send(200);
 });
 
