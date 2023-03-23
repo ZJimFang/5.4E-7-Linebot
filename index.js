@@ -39,6 +39,7 @@ app.get("/home", (req, res) => {
 //webhook
 app.post("/webhook", line.middleware(config), (req, res) => {
   if (req.body.events[0] !== undefined) {
+    console.log(req.body.events[0].source.userId);
     // let userId = req.body.events[0].source.userId;
     // if (
     //   userId ===
@@ -61,7 +62,7 @@ app.post("/webhook", line.middleware(config), (req, res) => {
 
     // handleEvent(req.body.events[0], flexMessageTemplate);
 
-    client.pushMessage(req.body.events[0].source.userId, {
+    client.replyMessage(req.body.events[0].replyToken, {
       type: "text",
       text: "hello",
     });
