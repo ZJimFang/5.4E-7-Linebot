@@ -55,6 +55,9 @@ app.post("/webhook", line.middleware(config), (req, res) => {
   }
 
   const event = req.body.events[0];
+  let flexMessageTemplate = JSON.parse(
+    JSON.stringify(initialFlexMessageTemplate)
+  );
 
   requestTable.push(userId);
   handleEvent(event, flexMessageTemplate);
