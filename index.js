@@ -39,27 +39,32 @@ app.get("/home", (req, res) => {
 //webhook
 app.post("/webhook", line.middleware(config), (req, res) => {
   if (req.body.events[0] !== undefined) {
-    let userId = req.body.events[0].source.userId;
-    if (
-      userId ===
-      requestTable.find(
-        (element) => element == req.body.events[0].source.userId
-      )
-    ) {
-      client.pushMessage(req.body.events[0].source.userId, {
-        type: "text",
-        text: "請勿短時間內發出大量請求，否則將被禁止",
-      });
-      return;
-    }
+    // let userId = req.body.events[0].source.userId;
+    // if (
+    //   userId ===
+    //   requestTable.find(
+    //     (element) => element == req.body.events[0].source.userId
+    //   )
+    // ) {
+    //   client.pushMessage(req.body.events[0].source.userId, {
+    //     type: "text",
+    //     text: "請勿短時間內發出大量請求，否則將被禁止",
+    //   });
+    //   return;
+    // }
 
-    // requestTable.push(userId);
-    // eventQueue.push(req.body.events[0]);
-    let flexMessageTemplate = JSON.parse(
-      JSON.stringify(initialFlexMessageTemplate)
-    );
+    // // requestTable.push(userId);
+    // // eventQueue.push(req.body.events[0]);
+    // let flexMessageTemplate = JSON.parse(
+    //   JSON.stringify(initialFlexMessageTemplate)
+    // );
 
-    handleEvent(req.body.events[0], flexMessageTemplate);
+    // handleEvent(req.body.events[0], flexMessageTemplate);
+
+    client.pushMessage(req.body.events[0].source.userId, {
+      type: "text",
+      text: "hello",
+    });
   }
 
   res.send(200);
