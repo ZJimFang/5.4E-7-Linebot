@@ -59,7 +59,7 @@ app.post("/webhook", line.middleware(config), (req, res) => {
       JSON.stringify(initialFlexMessageTemplate)
     );
 
-    handleEvent(event, flexMessageTemplate);
+    handleEvent(req.body.events[0], flexMessageTemplate);
   }
 
   res.send(200);
