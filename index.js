@@ -61,14 +61,17 @@ app.post("/webhook", line.middleware(config), (req, res) => {
     // );
 
     // handleEvent(req.body.events[0], flexMessageTemplate);
-    try {
-      client.replyMessage(req.body.events[0].replyToken, {
+    client
+      .replyMessage(req.body.events[0].replyToken, {
         type: "text",
         text: "hello",
+      })
+      .then(() => {
+        console.log("回應訊息成功");
+      })
+      .catch((err) => {
+        console.log("回應訊息失敗，錯誤訊息：", err);
       });
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   res.send(200);
