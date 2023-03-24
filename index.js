@@ -39,59 +39,42 @@ app.get("/home", (req, res) => {
 //webhook
 app.post("/webhook", line.middleware(config), (req, res) => {
   if (req.body.events[0] !== undefined) {
-    console.log(req.body.events[0].source.userId);
-    // let userId = req.body.events[0].source.userId;
-    // if (
-    //   userId ===
-    //   requestTable.find(
-    //     (element) => element == req.body.events[0].source.userId
-    //   )
-    // ) {
-    //   client.pushMessage(req.body.events[0].source.userId, {
-    //     type: "text",
-    //     text: "請勿短時間內發出大量請求，否則將被禁止",
-    //   });
-    //   return;
-    // }
-
-    // // requestTable.push(userId);
-    // // eventQueue.push(req.body.events[0]);
-    // let flexMessageTemplate = JSON.parse(
-    //   JSON.stringify(initialFlexMessageTemplate)
-    // );
-
-    // handleEvent(req.body.events[0], flexMessageTemplate);
-    client
-      .replyMessage(req.body.events[0].replyToken, {
+    let userId = req.body.events[0].source.userId;
+    if (
+      userId ===
+      requestTable.find(
+        (element) => element == req.body.events[0].source.userId
+      )
+    ) {
+      client.pushMessage(req.body.events[0].source.userId, {
         type: "text",
-        text: "hello",
-      })
-      .then(() => {
-        console.log("回應訊息成功");
-      })
-      .catch((err) => {
-        console.log("回應訊息失敗，錯誤訊息：", err);
+        text: "請勿短時間內發出大量請求，否則將被禁止",
       });
+      return;
+    }
+
+    requestTable.push(userId);
+    eventQueue.push(req.body.events[0]);
   }
 
   res.send(200);
 });
 
 //scheduler
-// const eventJob = schedule.scheduleJob("* * * * * *", async function () {
-//   if (eventQueue.length > 0 && !lock) {
-//     //init json
-//     let flexMessageTemplate = JSON.parse(
-//       JSON.stringify(initialFlexMessageTemplate)
-//     );
+const eventJob = schedule.scheduleJob("* * * * * *", async function () {
+  if (eventQueue.length > 0 && !lock) {
+    //init json
+    let flexMessageTemplate = JSON.parse(
+      JSON.stringify(initialFlexMessageTemplate)
+    );
 
-//     lock = true;
-//     const event = eventQueue.shift();
-//     await handleEvent(event, flexMessageTemplate);
-//     await requestTable.shift();
-//     lock = false;
-//   }
-// });
+    lock = true;
+    const event = eventQueue.shift();
+    await handleEvent(event, flexMessageTemplate);
+    await requestTable.shift();
+    lock = false;
+  }
+});
 
 //scheduler setting
 const rule = new schedule.RecurrenceRule();
