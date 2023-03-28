@@ -54,16 +54,6 @@ module.exports.reserve = async (db, flexMessageTemplate) => {
           }
         });
 
-        //塞入格式訊息
-        // flexMessageTemplate.contents.contents[dateOrder].header.contents.push({
-        //   type: "text",
-        //   text: `如需預約請輸入以下格式\n月/日/時段\n舉例：4/10/A`,
-        //   margin: "8px",
-        //   weight: "regular",
-        //   style: "normal",
-        //   size: "19px",
-        //   wrap: true,
-        // });
         console.log("------------------");
       });
     dateOrder++;
@@ -100,7 +90,7 @@ module.exports.isReserved = async (db, request, userID) => {
         if (userIsReserved) {
           reply.text = "抱歉因多方考量，每個帳號只能預約一次";
         } else {
-          reply.text = "請輸入email";
+          reply.text = "請輸入你的Email\n（左下角鍵盤可以開啟輸入）";
           db.collection("userInfo")
             .doc(userID)
             .set({
@@ -175,7 +165,7 @@ module.exports.writeEmail = async (db, request, userID) => {
 
       return {
         type: "text",
-        text: "完成預約，請提前十分鐘抵達現場。",
+        text: "完成預約！請提前十分鐘底到現場～我們很高興能與你相遇",
       };
     }
   } else {
@@ -258,7 +248,7 @@ module.exports.changeToWordCloudStatus = async (db, userID, name, avatar) => {
 
   return {
     type: "text",
-    text: "有什麼想對5.4E+7說的話嗎？\n請輸入想說的話！並到我們的文字雲專區觀看吧",
+    text: "看完展覽有什麼想對5.4E+7說的嗎？\n———————————————\n上傳你的想法～\n與大家一起共享吧！\n（請一次輸入完整，勿分段輸入謝謝！）",
     wrap: true,
   };
 };
