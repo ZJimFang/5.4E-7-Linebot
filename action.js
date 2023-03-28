@@ -47,22 +47,23 @@ module.exports.reserve = async (db, flexMessageTemplate) => {
               dateOrder,
               alphabeticalOrder,
               i,
-              isReserved
+              isReserved,
+              date
             );
             alphabeticalOrder++;
           }
         });
 
         //塞入格式訊息
-        flexMessageTemplate.contents.contents[dateOrder].header.contents.push({
-          type: "text",
-          text: `如需預約請輸入以下格式\n月/日/時段\n舉例：4/10/A`,
-          margin: "8px",
-          weight: "regular",
-          style: "normal",
-          size: "19px",
-          wrap: true,
-        });
+        // flexMessageTemplate.contents.contents[dateOrder].header.contents.push({
+        //   type: "text",
+        //   text: `如需預約請輸入以下格式\n月/日/時段\n舉例：4/10/A`,
+        //   margin: "8px",
+        //   weight: "regular",
+        //   style: "normal",
+        //   size: "19px",
+        //   wrap: true,
+        // });
         console.log("------------------");
       });
     dateOrder++;

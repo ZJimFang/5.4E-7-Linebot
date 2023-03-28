@@ -21,24 +21,27 @@ module.exports.insertTimeJson = (
   dateOrder,
   alphabeticalOrder,
   i,
-  isReserved
+  isReserved,
+  date
 ) => {
   const format = {
-    type: "text",
-    text: `
-    ${numberToString[alphabeticalOrder]}. ${i === 1 ? hour++ : hour}:${
-      i === 0 ? "00" : "30"
-    } ~ ${i === 1 ? hour++ : hour}:${i === 0 ? "30" : "00"}`,
-    weight: "regular",
-    offsetStart: "20px",
-    margin: "5px",
+    type: "button",
+    style: "link",
+    height: "sm",
+    action: {
+      type: "message",
+      label: `
+      ${i === 1 ? hour++ : hour}:${i === 0 ? "00" : "30"} ~ ${
+        i === 1 ? hour++ : hour
+      }:${i === 0 ? "30" : "00"}`,
+      text: `4/${date}/${numberToString[alphabeticalOrder]}`,
+    },
+    offsetStart: "-30px",
   };
 
-  if (isReserved) {
-    format.decoration = "line-through";
+  if (!isReserved) {
+    flexMessageTemplate.contents.contents[dateOrder].body.contents.push(format);
   }
-
-  flexMessageTemplate.contents.contents[dateOrder].header.contents.push(format);
 
   return flexMessageTemplate;
 };
