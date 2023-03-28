@@ -48,7 +48,7 @@ app.post("/webhook", line.middleware(config), (req, res) => {
     ) {
       client.pushMessage(req.body.events[0].source.userId, {
         type: "text",
-        text: "請勿短時間內發出大量請求，否則將被禁止",
+        text: "請勿短時間內發出大量請求，否則將被加入黑名單",
       });
       return;
     }
