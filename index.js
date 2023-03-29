@@ -123,7 +123,7 @@ async function handleEvent(event, flexMessageTemplate) {
       //請稍候
       await client.pushMessage(event.source.userId, {
         type: "text",
-        text: "請稍候⋯\n請點選以下表單中你想要的時段～",
+        text: "請稍候⋯\n請點選以下表單中您想要的時段～",
       });
       //to db query data to build json file
       const reply = await action.reserve(db, flexMessageTemplate);
@@ -144,7 +144,7 @@ async function handleEvent(event, flexMessageTemplate) {
       const reply = await action.delete(db, userID);
       await client.replyMessage(event.replyToken, {
         type: "text",
-        text: "請稍候⋯\n你的預約時段已經刪除完成！",
+        text: "請稍候⋯\n您的預約時段已經刪除完成！",
       });
     } else if (request === "文字雲") {
       const profile = await client.getProfile(userID);
@@ -189,11 +189,17 @@ async function handleEvent(event, flexMessageTemplate) {
       }
     }
   } catch (error) {
-    console.log(error);
-    await client.pushMessage(event.source.userId, {
-      type: "text",
-      text: "格式錯誤❌請填入正確格式，或重新操作！",
-    });
+    if (error.message === "noServed") {
+      await client.replyMessage(event.replyToken, {
+        type: "text",
+        text: "目前沒查詢到您預約的時段，可以利用預約功能預約時段～",
+      });
+    } else {
+      await client.replyMessage(event.replyToken, {
+        type: "text",
+        text: "格式錯誤❌請填入正確格式，或重新操作！",
+      });
+    }
   }
   console.log("finish");
 }

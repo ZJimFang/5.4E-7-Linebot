@@ -87,10 +87,12 @@ module.exports.isReserved = async (db, request, userID) => {
         reply.text = "該時間已被預約";
       } else {
         const userIsReserved = await checkIsReserved(db, userID);
-        if (userIsReserved) {
+        const hasEmail = await emailCheck(db, userID);
+
+        if (userIsReserved && hasEmail) {
           reply.text = "抱歉因多方考量，每個帳號只能預約一次";
         } else {
-          reply.text = "請輸入你的Email\n（左下角鍵盤可以開啟輸入）";
+          reply.text = "請輸入您的Email\n（左下角鍵盤可以開啟輸入）";
           db.collection("userInfo")
             .doc(userID)
             .set({
@@ -109,15 +111,7 @@ module.exports.writeEmail = async (db, request, userID) => {
   const userIsReserved = await checkIsReserved(db, userID);
 
   //user是否已填寫過email
-  const hasEmail = await db
-    .collection("userInfo")
-    .doc(userID)
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        return doc.data().email === "" ? false : true;
-      }
-    });
+  const hasEmail = await emailCheck(db, userID);
 
   if (userIsReserved) {
     if (hasEmail) {
@@ -165,7 +159,7 @@ module.exports.writeEmail = async (db, request, userID) => {
 
       return {
         type: "text",
-        text: "完成預約！請提前十分鐘底到現場～我們很高興能與你相遇",
+        text: "完成預約！請提前十分鐘底到現場～我們很高興能與您相遇",
       };
     }
   } else {
@@ -188,7 +182,7 @@ module.exports.query = async (db, userID) => {
     .doc(userID)
     .get()
     .then((doc) => {
-      if (doc.exists) {
+      if (doc.exists && doc.data().email !== "") {
         const reservedTime = doc.data().reservedTime;
         month = reservedTime[0];
         date = reservedTime[1];
@@ -208,6 +202,7 @@ module.exports.delete = async (db, userID) => {
 
   //update bookingTime
   await userInfoRef.get().then((doc) => {
+    if (!doc.exists) throw new Error("noServed");
     reservedTime = doc.data().reservedTime;
     month = reservedTime[0];
     date = reservedTime[1];
@@ -248,7 +243,7 @@ module.exports.changeToWordCloudStatus = async (db, userID, name, avatar) => {
 
   return {
     type: "text",
-    text: "看完展覽有什麼想對5.4E+7說的嗎？\n———————————————\n上傳你的想法～\n與大家一起共享吧！\n（請一次輸入完整，勿分段輸入謝謝！）",
+    text: "看完展覽有什麼想對5.4E+7說的嗎？\n———————————————\n上傳您的想法～\n與大家一起共享吧！\n（請一次輸入完整，勿分段輸入謝謝！）",
     wrap: true,
   };
 };
@@ -275,4 +270,19 @@ async function checkIsReserved(db, userID) {
     });
 
   return userIsReserved;
+}
+
+async function emailCheck(db, userID) {
+  const hasEmail = await db
+    .collection("userInfo")
+    .doc(userID)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        return doc.data().email === "" ? false : true;
+      }
+      return false;
+    });
+
+  return hasEmail;
 }
