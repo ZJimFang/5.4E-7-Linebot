@@ -243,7 +243,7 @@ module.exports.changeToWordCloudStatus = async (db, userID, name, avatar) => {
 
   return {
     type: "text",
-    text: "看完展覽有什麼想對5.4E+7說的嗎？\n———————————————\n上傳您的想法～\n與大家一起共享吧！\n（請一次輸入完整，勿分段輸入謝謝！）",
+    text: "看完展覽有什麼想對5.4E+7說的嗎？\n\n上傳你的想法～\n與大家一起共享吧！\n————————————\n#請一次輸入完整\n#勿分段輸入\n#勿貼圖\n我們讀不出來的(＞人＜;)\n謝謝",
     wrap: true,
   };
 };
