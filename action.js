@@ -26,6 +26,8 @@ module.exports.reserve = async (db, flexMessageTemplate) => {
   const endDate = month === 4 ? 14 : 15;
 
   for (let date = beginDate; date <= endDate; date++) {
+    //4/11 stop reserve
+    if (date === 11) continue;
     await db
       .collection("Booking-Time")
       .doc(month.toString())
@@ -39,17 +41,19 @@ module.exports.reserve = async (db, flexMessageTemplate) => {
           const periodArr = doc.data().period;
           for (let i = 0; i < periodArr.length; i++) {
             let isReserved = periodArr[i];
-
-            //塞入時段
-            flexMessageTemplate = buildJson.insertTimeJson(
-              flexMessageTemplate,
-              doc.id,
-              dateOrder,
-              alphabeticalOrder,
-              i,
-              isReserved,
-              date
-            );
+            //吃飯時間
+            if (alphabeticalOrder !== 4) {
+              //塞入時段
+              flexMessageTemplate = buildJson.insertTimeJson(
+                flexMessageTemplate,
+                doc.id,
+                dateOrder,
+                alphabeticalOrder,
+                i,
+                isReserved,
+                date
+              );
+            }
             alphabeticalOrder++;
           }
         });

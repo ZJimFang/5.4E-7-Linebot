@@ -25,27 +25,7 @@
           ]
         }
       },
-      {
-        "type": "bubble",
-        "body": {
-          "type": "box",
-          "layout": "vertical",
-          "contents": [
-            {
-              "type": "text",
-              "text": "5.4E+7可預約時段",
-              "size": "25px",
-              "weight": "bold"
-            },
-            {
-              "type": "text",
-              "text": "4/11",
-              "margin": "8px",
-              "size": "19px"
-            }
-          ]
-        }
-      },
+
       {
         "type": "bubble",
         "body": {

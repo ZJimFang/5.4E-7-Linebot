@@ -115,8 +115,7 @@ async function handleEvent(event, flexMessageTemplate) {
 
   let request = event.message.text;
   const dateRegex = /^[45]\/1[0-5]\/[A-N]$/;
-  const emailRegex =
-    /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
+  const emailRegex = /^.+@.+\..{2,3}$/;
   try {
     //output reserve schedule
     if (request === "預約時間") {
