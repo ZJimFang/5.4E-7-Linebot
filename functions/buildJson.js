@@ -37,6 +37,7 @@ module.exports.insertTimeJson = (
       text: `4/${date}/${numberToString[alphabeticalOrder]}`,
     },
     offsetStart: "-30px",
+    margin: "5px",
   };
 
   if (!isReserved) {

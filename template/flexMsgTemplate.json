@@ -12,20 +12,61 @@
           "contents": [
             {
               "type": "text",
-              "text": "5.4E+7可預約時段",
+              "text": "4/10可預約時段",
               "size": "25px",
               "weight": "bold"
             },
             {
-              "type": "text",
-              "text": "4/10",
-              "margin": "8px",
-              "size": "19px"
+              "type": "box",
+              "layout": "horizontal",
+              "margin": "lg",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "#",
+                  "color": "#aaaaaa",
+                  "size": "sm",
+                  "align": "center",
+                  "gravity": "center"
+                },
+                {
+                  "type": "text",
+                  "text": "遊玩人數為1~2人",
+                  "wrap": true,
+                  "color": "#666666",
+                  "size": "sm",
+                  "flex": 5
+                }
+              ]
+            },
+            {
+              "type": "box",
+              "layout": "horizontal",
+              "margin": "lg",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "#",
+                  "color": "#aaaaaa",
+                  "size": "sm",
+                  "align": "center",
+                  "gravity": "center"
+                },
+                {
+                  "type": "text",
+                  "text": "遊玩時間為15~20分鐘",
+                  "wrap": true,
+                  "color": "#666666",
+                  "size": "sm",
+                  "flex": 5
+                }
+              ]
             }
           ]
         }
       },
-
       {
         "type": "bubble",
         "body": {
@@ -34,15 +75,57 @@
           "contents": [
             {
               "type": "text",
-              "text": "5.4E+7可預約時段",
+              "text": "4/12可預約時段",
               "size": "25px",
               "weight": "bold"
             },
             {
-              "type": "text",
-              "text": "4/12",
-              "margin": "8px",
-              "size": "19px"
+              "type": "box",
+              "layout": "horizontal",
+              "margin": "lg",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "#",
+                  "color": "#aaaaaa",
+                  "size": "sm",
+                  "align": "center",
+                  "gravity": "center"
+                },
+                {
+                  "type": "text",
+                  "text": "遊玩人數為1~2人",
+                  "wrap": true,
+                  "color": "#666666",
+                  "size": "sm",
+                  "flex": 5
+                }
+              ]
+            },
+            {
+              "type": "box",
+              "layout": "horizontal",
+              "margin": "lg",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "#",
+                  "color": "#aaaaaa",
+                  "size": "sm",
+                  "align": "center",
+                  "gravity": "center"
+                },
+                {
+                  "type": "text",
+                  "text": "遊玩時間為15~20分鐘",
+                  "wrap": true,
+                  "color": "#666666",
+                  "size": "sm",
+                  "flex": 5
+                }
+              ]
             }
           ]
         }
@@ -55,15 +138,57 @@
           "contents": [
             {
               "type": "text",
-              "text": "5.4E+7可預約時段",
+              "text": "4/13可預約時段",
               "size": "25px",
               "weight": "bold"
             },
             {
-              "type": "text",
-              "text": "4/13",
-              "margin": "8px",
-              "size": "19px"
+              "type": "box",
+              "layout": "horizontal",
+              "margin": "lg",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "#",
+                  "color": "#aaaaaa",
+                  "size": "sm",
+                  "align": "center",
+                  "gravity": "center"
+                },
+                {
+                  "type": "text",
+                  "text": "遊玩人數為1~2人",
+                  "wrap": true,
+                  "color": "#666666",
+                  "size": "sm",
+                  "flex": 5
+                }
+              ]
+            },
+            {
+              "type": "box",
+              "layout": "horizontal",
+              "margin": "lg",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "#",
+                  "color": "#aaaaaa",
+                  "size": "sm",
+                  "align": "center",
+                  "gravity": "center"
+                },
+                {
+                  "type": "text",
+                  "text": "遊玩時間為15~20分鐘",
+                  "wrap": true,
+                  "color": "#666666",
+                  "size": "sm",
+                  "flex": 5
+                }
+              ]
             }
           ]
         }
@@ -76,15 +201,57 @@
           "contents": [
             {
               "type": "text",
-              "text": "5.4E+7可預約時段",
+              "text": "4/14可預約時段",
               "size": "25px",
               "weight": "bold"
             },
             {
-              "type": "text",
-              "text": "4/14",
-              "margin": "8px",
-              "size": "19px"
+              "type": "box",
+              "layout": "horizontal",
+              "margin": "lg",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "#",
+                  "color": "#aaaaaa",
+                  "size": "sm",
+                  "align": "center",
+                  "gravity": "center"
+                },
+                {
+                  "type": "text",
+                  "text": "遊玩人數為1~2人",
+                  "wrap": true,
+                  "color": "#666666",
+                  "size": "sm",
+                  "flex": 5
+                }
+              ]
+            },
+            {
+              "type": "box",
+              "layout": "horizontal",
+              "margin": "lg",
+              "spacing": "sm",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": "#",
+                  "color": "#aaaaaa",
+                  "size": "sm",
+                  "align": "center",
+                  "gravity": "center"
+                },
+                {
+                  "type": "text",
+                  "text": "遊玩時間為15~20分鐘",
+                  "wrap": true,
+                  "color": "#666666",
+                  "size": "sm",
+                  "flex": 5
+                }
+              ]
             }
           ]
         }
