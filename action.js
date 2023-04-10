@@ -163,7 +163,9 @@ module.exports.writeEmail = async (db, request, userID) => {
 
       return {
         type: "text",
-        text: "完成預約！請提前十分鐘抵達現場～我們很高興能與您相遇",
+        text: `完成預約！\n您預約的時間是${month}/${date} ${hour}:${
+          block === 0 ? "00" : "30"
+        }\n請提前十分鐘抵達現場～我們很高興能與您相遇`,
       };
     }
   } else {
