@@ -22,12 +22,12 @@ let dateOrder = 0;
 
 module.exports.reserve = async (db, flexMessageTemplate) => {
   const month = 4;
-  const beginDate = month === 4 ? 10 : 12;
+  const beginDate = 12;
   const endDate = month === 4 ? 14 : 15;
 
   for (let date = beginDate; date <= endDate; date++) {
     //4/11 stop reserve
-    if (date === 11) continue;
+    // if (date === 11) continue;
     await db
       .collection("Booking-Time")
       .doc(month.toString())
@@ -163,7 +163,7 @@ module.exports.writeEmail = async (db, request, userID) => {
 
       return {
         type: "text",
-        text: "完成預約！請提前十分鐘底到現場～我們很高興能與您相遇",
+        text: "完成預約！請提前十分鐘抵達現場～我們很高興能與您相遇",
       };
     }
   } else {
