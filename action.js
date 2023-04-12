@@ -22,7 +22,7 @@ let dateOrder = 0;
 
 module.exports.reserve = async (db, flexMessageTemplate) => {
   const month = 4;
-  const beginDate = 12;
+  const beginDate = 14;
   const endDate = month === 4 ? 14 : 15;
 
   for (let date = beginDate; date <= endDate; date++) {
