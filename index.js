@@ -6,7 +6,8 @@ const schedule = require("node-schedule");
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
-const cors = require("cors")({ origin: true });
+const cors = require("cors");
+const axios = require("axios");
 
 const initialFlexMessageTemplate = require("./template/flexMsgTemplate.json");
 const queryDeleteFlexMessageTemplate = require("./template/queryDelete.json");
@@ -24,17 +25,45 @@ const db = admin.firestore();
 const client = new line.Client(config);
 
 const app = express();
-
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Credentials", false);
+//   res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+//   );
+//   next();
+// });
+app.use(cors());
 let lock = false;
 
 const eventQueue = [];
 const requestTable = [];
 
-app.get("/home", (req, res) => {
-  return res.status(200).json({
-    title: "Express Testing",
-    message: "The app is working properly!",
-  });
+app.get("/getUserName", (req, res) => {
+  async function getUserName(userId) {
+    try {
+      const response = await axios.get(
+        `https://api.line.me/v2/bot/profile/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.CHANNEL_ACCESS_TOKEN}`,
+          },
+        }
+      );
+      const displayName = response.data.displayName;
+      console.log(displayName);
+      res.send({ displayName: displayName });
+    } catch (error) {
+      res.send(error);
+    }
+  }
+
+  getUserName(req.query.userId);
 });
 //webhook
 app.post("/webhook", line.middleware(config), (req, res) => {
