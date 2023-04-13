@@ -45,8 +45,11 @@ app.get("/getUserName", (req, res) => {
         }
       );
       const displayName = response.data.displayName;
-      console.log(displayName);
-      res.send({ displayName: displayName });
+      console.log(response.data);
+      res.send({
+        pictureUrl: response.data.pictureUrl,
+        displayName: response.data.displayName,
+      });
     } catch (error) {
       res.send(error);
     }
@@ -138,13 +141,18 @@ async function handleEvent(event, flexMessageTemplate) {
     //output reserve schedule
     if (request === "預約時間") {
       //請稍候
-      await client.pushMessage(event.source.userId, {
+      // await client.pushMessage(event.source.userId, {
+      //   type: "text",
+      //   text: "請稍候⋯\n請點選以下表單中您想要的時段～",
+      // });
+      // //to db query data to build json file
+      // const reply = await action.reserve(db, flexMessageTemplate);
+      // await client.replyMessage(event.replyToken, reply);
+      client.replyMessage(event.replyToken, {
         type: "text",
-        text: "請稍候⋯\n請點選以下表單中您想要的時段～",
+        text: "很抱歉！\n5.4E+7的預約時段已全數額滿。\n若想遊玩可以試著至現場詢問工作人員進行，有空檔都會讓大家遊玩喔～",
+        wrap: true,
       });
-      //to db query data to build json file
-      const reply = await action.reserve(db, flexMessageTemplate);
-      await client.replyMessage(event.replyToken, reply);
     } else if (request === "查詢/刪除預約") {
       await client.replyMessage(
         event.replyToken,
