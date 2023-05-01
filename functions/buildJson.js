@@ -34,7 +34,7 @@ module.exports.insertTimeJson = (
       ${i === 1 ? hour++ : hour}:${i === 0 ? "00" : "30"} ~ ${
         i === 1 ? hour++ : hour
       }:${i === 0 ? "30" : "00"}`,
-      text: `4/${date}/${numberToString[alphabeticalOrder]}`,
+      text: `5/${date}/${numberToString[alphabeticalOrder]}`,
     },
     offsetStart: "-30px",
     margin: "5px",

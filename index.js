@@ -136,23 +136,23 @@ async function handleEvent(event, flexMessageTemplate) {
 
   let request = event.message.text;
   const dateRegex = /^[45]\/1[0-5]\/[A-N]$/;
-  const emailRegex = /^.+@.+\..{2,3}$/;
+  const phoneRegex = /^(\+886-?|0)?9\d{8}$/;
   try {
     //output reserve schedule
     if (request === "預約時間") {
       //請稍候
-      // await client.pushMessage(event.source.userId, {
-      //   type: "text",
-      //   text: "請稍候⋯\n請點選以下表單中您想要的時段～",
-      // });
-      // //to db query data to build json file
-      // const reply = await action.reserve(db, flexMessageTemplate);
-      // await client.replyMessage(event.replyToken, reply);
-      client.replyMessage(event.replyToken, {
+      await client.pushMessage(event.source.userId, {
         type: "text",
-        text: "很抱歉！\n5.4E+7的預約時段已全數額滿。\n若想遊玩可以試著至現場詢問工作人員進行，有空檔都會讓大家遊玩喔～",
-        wrap: true,
+        text: "請稍候⋯\n請點選以下表單中您想要的時段～",
       });
+      //to db query data to build json file
+      const reply = await action.reserve(db, flexMessageTemplate);
+      await client.replyMessage(event.replyToken, reply);
+      // client.replyMessage(event.replyToken, {
+      //   type: "text",
+      //   text: "很抱歉！\n5.4E+7的預約時段已全數額滿。\n若想遊玩可以試著至現場詢問工作人員進行，有空檔都會讓大家遊玩喔～",
+      //   wrap: true,
+      // });
     } else if (request === "查詢/刪除預約") {
       await client.replyMessage(
         event.replyToken,
@@ -187,12 +187,12 @@ async function handleEvent(event, flexMessageTemplate) {
       await client.replyMessage(event.replyToken, reply);
     }
     //write email in database
-    else if (emailRegex.test(request)) {
+    else if (phoneRegex.test(request)) {
       await client.pushMessage(event.source.userId, {
         type: "text",
         text: "正在預約您的時段，請稍候",
       });
-      const reply = await action.writeEmail(db, request, userID);
+      const reply = await action.writePhone(db, request, userID);
       await client.replyMessage(event.replyToken, reply);
     }
     //default

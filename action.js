@@ -21,8 +21,8 @@ const buildJson = require("./functions/buildJson");
 let dateOrder = 0;
 
 module.exports.reserve = async (db, flexMessageTemplate) => {
-  const month = 4;
-  const beginDate = 14;
+  const month = 5;
+  const beginDate = 12;
   const endDate = month === 4 ? 14 : 15;
 
   for (let date = beginDate; date <= endDate; date++) {
@@ -91,16 +91,16 @@ module.exports.isReserved = async (db, request, userID) => {
         reply.text = "該時間已被預約";
       } else {
         const userIsReserved = await checkIsReserved(db, userID);
-        const hasEmail = await emailCheck(db, userID);
+        const hasPhone = await phoneCheck(db, userID);
 
-        if (userIsReserved && hasEmail) {
+        if (userIsReserved && hasPhone) {
           reply.text = "抱歉因多方考量，每個帳號只能預約一次";
         } else {
-          reply.text = "請輸入您的Email\n（左下角鍵盤可以開啟輸入）";
+          reply.text = "請輸入您的電話\n（左下角鍵盤可以開啟輸入）";
           db.collection("userInfo")
             .doc(userID)
             .set({
-              email: "",
+              phone: "",
               reservedTime: [month, date, hour, time],
             });
         }
@@ -110,15 +110,15 @@ module.exports.isReserved = async (db, request, userID) => {
   return reply;
 };
 
-module.exports.writeEmail = async (db, request, userID) => {
+module.exports.writePhone = async (db, request, userID) => {
   //user是否已選擇時間
   const userIsReserved = await checkIsReserved(db, userID);
 
   //user是否已填寫過email
-  const hasEmail = await emailCheck(db, userID);
+  const hasPhone = await phoneCheck(db, userID);
 
   if (userIsReserved) {
-    if (hasEmail) {
+    if (hasPhone) {
       return {
         type: "text",
         text: "您已預約，如需更改資訊請私訊粉絲專頁。",
@@ -126,10 +126,10 @@ module.exports.writeEmail = async (db, request, userID) => {
     } else {
       let month, date, hour, time;
 
-      //update email
+      //update phone
       const userInfoRef = db.collection("userInfo").doc(userID);
       await userInfoRef.update({
-        email: request,
+        phone: request,
       });
 
       //get user reserved time
@@ -278,17 +278,18 @@ async function checkIsReserved(db, userID) {
   return userIsReserved;
 }
 
-async function emailCheck(db, userID) {
-  const hasEmail = await db
+async function phoneCheck(db, userID) {
+  const hasPhone = await db
     .collection("userInfo")
     .doc(userID)
     .get()
     .then((doc) => {
       if (doc.exists) {
-        return doc.data().email === "" ? false : true;
+        return doc.data().phone === "" ? false : true;
       }
       return false;
     });
+  console.log(hasPhone);
 
-  return hasEmail;
+  return hasPhone;
 }
